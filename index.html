@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSC Current Affairs Quiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
+        #quiz-area { display: none; } /* शुरू में क्विज़ छिपा रहेगा */
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
+        .btn:hover { background-color: #0056b3; }
+        .question { margin-bottom: 20px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #007bff; }
+        .question label { display: block; margin: 8px 0; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="login-area" class="container">
+        <h2>छात्र लॉगिन</h2>
+        <input type="text" id="userName" placeholder="अपना नाम लिखें (उदा. Rousan)">
+        <input type="text" id="userRoll" placeholder="रोल नंबर लिखें (उदा. 4)">
+        <button class="btn" onclick="login()">क्विज़ शुरू करें</button>
+    </div>
+
+    <div id="quiz-area" class="container">
+        <h2 id="welcome-msg"></h2>
+        <hr>
+        <div id="questions-container">
+            </div>
+        <button class="btn" onclick="submitQuiz()">रिजल्ट देखें</button>
+    </div>
+
+    <script>
+        // 1. छात्रों का डेटाबेस (इसे पूरा किया गया है)
+        const studentDatabase = [
+            { name: "Rousan", roll: "4" },
+            { name: "Amit", roll: "101" } // आप यहाँ और भी नाम जोड़ सकते हैं
+        ];
+
+        // 2. क्विज़ के प्रश्न और उनके सही उत्तर
+        const quizQuestions = [
+            {id: 1,
+                question: "हाल ही में G20 शिखर सम्मेलन कहाँ आयोजित किया गया था?",
+                options: ["नई दिल्ली", "पेरिस", "न्यूयॉर्क", "टोक्यो"],
+                answer: "नई दिल्ली"
+            },
+            {id: 2,
+                question: "ISRO ने चंद्रयान-3 कब लॉन्च किया था?",
+                options: ["14 जुलाई 2023", "15 अगस्त 2023", "1 जनवरी 2024", "26 जनवरी 2024"],
+                answer: "14 जुलाई 2023"
+            },
+            {id: 3,
+                question: "वर्तमान में भारत के रिज़र्व बैंक (RBI) के गवर्नर कौन हैं?",
+                options: ["रघुराम राजन", "उर्जित पटेल", "शक्तिकांत दास", "निर्मला सीतारमण"],
+                answer: "शक्तिकांत दास"
+            },
+           
+    {
+        id: 4,
+        question: "फरवरी 2026 में आयोजित 19वें शीतकालीन एशियाई खेलों (Winter Asian Games) की मेजबानी किस देश ने की?",
+        options: ["चीन", "दक्षिण कोरिया", "जापान", "कजाकिस्तान"],
+        correctAnswer: "चीन"
+    },
+    {
+        id: 5,
+        question: "हाल ही में 'विश्व कैंसर दिवस 2026' (4 फरवरी) की थीम क्या रखी गई थी?",
+        options: ["Close the Care Gap", "I Am and I Will", "Fight Against Cancer", "Cancer-Free Future"],
+        correctAnswer: "Close the Care Gap"
+    },
+    {
+        id: 6,
+        question: "भारत के किस पड़ोसी देश में हाल ही में मार्च 2026 में आम चुनाव संपन्न हुए हैं?",
+        options: ["भूटान", "नेपाल", "म्यांमार", "बांग्लादेश"],
+        correctAnswer: "नेपाल"
+    },
+    {
+        id: 7,
+        question: "भारतीय रिजर्व बैंक (RBI) के वर्तमान गवर्नर कौन हैं (मार्च 2026 तक)?",
+        options: ["रघुराम राजन", "शक्तिकांत दास", "उर्जित पटेल", "निर्मला सीतारमण"],
+        correctAnswer: "शक्तिकांत दास"
+    },
+    {
+        id: 8,
+        question: "इसरो (ISRO) द्वारा मंगलयान-2 मिशन को किस वर्ष लॉन्च करने का लक्ष्य रखा गया है?",
+        options: ["2026", "2027", "2028", "2030"],
+        correctAnswer: "2026"
+    },
+    {
+        id: 9,
+        question: "फरवरी 2026 में दादा साहब फाल्के अंतरराष्ट्रीय फिल्म महोत्सव में 'सर्वश्रेष्ठ फिल्म' का पुरस्कार किसे मिला?",
+        options: ["एनिमल", "जवान", "12th फेल", "सैम बहादुर"],
+        correctAnswer: "12th फेल"
+    },
+    {
+        id: 10,
+        question: "हाल ही में किस भारतीय राज्य ने अपनी पहली 'आर्टिफिशियल इंटेलिजेंस (AI) सिटी' स्थापित करने की घोषणा की है?",
+        options: ["कर्नाटक", "उत्तर प्रदेश", "तेलंगाना", "महाराष्ट्र"],
+        correctAnswer: "उत्तर प्रदेश"
+    },
+    {
+        id: 11,
+        question: "2026 में होने वाले फीफा विश्व कप (FIFA World Cup) की मेजबानी कौन से तीन देश मिलकर करेंगे?",
+        options: ["भारत, चीन और जापान", "कनाडा, मैक्सिको और अमेरिका", "कतर, यूएई और सऊदी अरब", "फ्रांस, जर्मनी और इटली"],
+        correctAnswer: "कनाडा, मैक्सिको और अमेरिका"
+    },
+    {
+        id: 12,
+        question: "वर्तमान में भारत के चीफ ऑफ डिफेंस स्टाफ (CDS) कौन हैं?",
+        options: ["जनरल मनोज पांडे", "जनरल अनिल चौहान", "एडमिरल आर. हरि कुमार", "एयर चीफ मार्शल वी.आर. चौधरी"],
+        correctAnswer: "जनरल अनिल चौहान"
+    },
+    {
+        id: 13,
+        question: "भारत के किस शहर को हाल ही में स्वच्छ सर्वेक्षण 2025-26 में लगातार आठवीं बार 'सबसे स्वच्छ शहर' चुना गया?",
+        options: ["सूरत", "इंदौर", "नवी मुंबई", "अहमदाबाद"],
+        correctAnswer: "इंदौर"
+    }
+];
+        
+
+        // 3. लॉगिन फंक्शन
+        function login() {
+            const enteredName = document.getElementById("userName").value.trim();
+            const enteredRoll = document.getElementById("userRoll").value.trim();
+
+            if (enteredName === "" || enteredRoll === "") {
+                alert("कृपया अपना नाम और रोल नंबर दोनों भरें!");
+                return;
+            }
+
+            // चेक करें कि छात्र डेटाबेस में है या नहीं
+            const isValidStudent = studentDatabase.find(
+                student => student.name.toLowerCase() === enteredName.toLowerCase() && student.roll === enteredRoll
+            );
+
+            if (isValidStudent) {
+                // लॉगिन सफल: लॉगिन एरिया छुपाएं और क्विज़ एरिया दिखाएं
+                document.getElementById("login-area").style.display = "none";
+                document.getElementById("quiz-area").style.display = "block";
+                document.getElementById("welcome-msg").innerText = "स्वागत है, " + isValidStudent.name + "!";
+                
+                // प्रश्न लोड करें
+                loadQuestions();
+            } else {
+                // लॉगिन विफल
+                alert("गलत नाम या रोल नंबर! कृपया दोबारा प्रयास करें।");
+            }
+        }
+
+        // 4. प्रश्नों को स्क्रीन पर दिखाने का फंक्शन
+        function loadQuestions() {
+            const container = document.getElementById("questions-container");
+            container.innerHTML = ""; // पहले का डेटा साफ करें
+
+            quizQuestions.forEach((qObj, index) => {
+                let questionHTML = `<div class="question">
+                    <p><strong>प्र. ${index + 1}: ${qObj.question}</strong></p>`;
+                
+                qObj.options.forEach(opt => {
+                    questionHTML += `<label><input type="radio" name="question${index}" value="${opt}"> ${opt}</label>`;
+                });
+
+                questionHTML += `</div>`;
+                container.innerHTML += questionHTML;
+            });
+        }
+
+        // 5. क्विज़ सबमिट करने और रिजल्ट देखने का फंक्शन
+        function submitQuiz() {
+            let score = 0;
+
+            quizQuestions.forEach((qObj, index) => {
+                // चेक करें कि यूज़र ने कौन सा ऑप्शन सेलेक्ट किया है
+                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                
+                if (selectedOption && selectedOption.value === qObj.answer) {
+                    score++;
+                }
+            });
+
+            alert(`क्विज़ समाप्त! आपका कुल स्कोर: ${score} / ${quizQuestions.length}`);
+            
+            // रिजल्ट दिखाने के बाद पेज को रिफ्रेश कर दें ताकि नया छात्र लॉगिन कर सके
+            location.reload();
+        }
+    </script>
+</body>
+</html>
